@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import { Box, Search, Card, Tag, Divider, Typography, Icon, Loading, Button, Pagination } from '@alifd/next';
+import { searchGoods, getAllCats } from '@/models/api/goods';
+import { GoodsDetailDTO, GoodsCatDTO } from '@/models/schema/goods';
+
 
 import styles from './index.module.scss';
 
@@ -12,92 +15,136 @@ export interface ICardItem {
 }
 
 export interface DataSource {
-  cards: ICardItem[];
-  tagsA: string[];
-  tagA: string;
+  datas: GoodsDetailDTO[]
+  pageNo: number
+  total: number
+  value: string
+  tabs: GoodsCatDTO[]
+  currentCatId: number
+  currentTabIndex: number
 }
 
 const DEFAULT_DATA: DataSource = {
-  tagsA: ['类目一', '类目二', '类目三', '类目四', '类目五', '类目六', '类目七', '类目八', '类目九', '类目十'],
-  tagA: '类目一',
-  cards: new Array(5).fill({
-    title: '构建一套产品化设计系统',
-    content: '随着互联网行业的聚变式发展，在电商业务从“信息透出” 到 “在线交易” 的过程中，网站 UI 构建也经历了“体验一致性”、“设计效率”、“UI系统构建/应用效率”、“多端适配” …',
-    subContent: '谢瑶 3 小时前更新',
-  }),
+  datas: [],
+  pageNo: 1,
+  total: 0,
+  value: '',
+  tabs: [],
+  currentCatId: 0,
+  currentTabIndex: 0,
+
 };
 
-const BasicList: React.FunctionComponent<BasicListProps> = (props: BasicListProps): JSX.Element => {
-  const {
-    dataSource = DEFAULT_DATA,
-    onSearch = (): void => { },
-  } = props;
+const BasicList: React.FunctionComponent = (): JSX.Element => {
 
-  const [tagAValue, setTagAValue] = useState(dataSource.tagA);
-  const [loading, setLoading] = useState(true);
+
+  const [loading, setLoading] = useState<boolean>(true);
+  //标签
+  const [tabs, setTabs] = useState<GoodsCatDTO[]>([]);
+  //当前选中标签
+  const [currentCatId, setCatId] = useState<number>(DEFAULT_DATA.currentCatId);
+  //商品数据
+  const [datas, setDatas] = useState<GoodsDetailDTO[]>(DEFAULT_DATA.datas);
+  //页码
+  const [pageNo, setPageNo] = useState<number>(DEFAULT_DATA.pageNo);
+  //总数
+  const [total, setTotal] = useState<number>(DEFAULT_DATA.total);
+
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  });
+    requestCatsList();
+  }, []);
 
-  const onTagAValueChange = (v: string) => {
+  useEffect(() => {
+    requestGoodsList();
+  }, [currentCatId]);
+
+  const onSearch = () => requestCatsList()
+
+  const onTagValueChange = (v: number) => {
     setLoading(true);
-    setTagAValue(v);
+    setCatId(v);
   };
 
 
-  const onSearchClick = () => {
-    setLoading(true);
-    onSearch();
+  const onSearchClick = () => requestGoodsList();
+
+  const onPaginationChange = (current: number) => {
+    setPageNo(current);
+    requestGoodsList();
+  }
+
+ /**
+   * 获取全量标签
+   */
+  const requestCatsList = () => {
+    getAllCats().then(res => {
+      setTabs(res.goodsCatsList); 
+      setCatId(res.goodsCatsList[0].catId);
+    }).catch(()=>{})
   };
 
-  const onPaginationChange = () => {
+  const requestGoodsList = () => {
     setLoading(true);
-  };
+    searchGoods({
+      pageNo: pageNo,
+      pageSize: 10,
+      keyword:  undefined,
+      catId: currentCatId === 0 ? undefined : currentCatId,
+    }).then(res => {
+      setDatas(res.records);
+      setTotal(res.total);
+      }).finally(() => setLoading(false))
+  }
 
-  const renderTagListA = () => {
+  const renderTabList = () => {
     //获取全量 tag 
-    return dataSource.tagsA.map((name: string) => (
+    return tabs.map((tab: GoodsCatDTO, i: number) => (
       <SelectableTag
-        key={name}
-        checked={tagAValue === name}
-        onChange={() => onTagAValueChange(name)}
-        {...props}
-      >{name}
+        key={tab.catId}
+        checked={currentCatId === tab.catId}
+        onChange={() => onTagValueChange(tab.catId)}
+      >{tab.catName}
       </SelectableTag>
     ));
   };
 
 
   const renderCards = () => {
-    return dataSource.cards.map((c: ICardItem, i: number) => (
+    return datas.map((c: GoodsDetailDTO, i: number) => (
       <div className={styles.ListItem} key={i}>
         <div className={styles.main}>
           <div className={styles.left}>
-            <img src="https://shadow.elemecdn.com/app/element/list.62a82841-1bcb-11ea-a71c-17428dec1b82.png" alt="img" />
+            <img src={c.goodsThumbnailUrl} alt="img" />
             <div>
               <div className={styles.title}>
-                {c.title}
+                {c.goodsName}
               </div>
               <div className={styles.content}>
-                {c.content}
+                {c.goodsDesc}
               </div>
               <div className={styles.subContent}>
-                {c.subContent}
+                {c.categoryName}
+              </div>
+              <div className={styles.subContent}>
+                {c.minGroupPrice/100}
+              </div>
+              <div className={styles.subContent}>
+                {c.minGroupPrice/100}
+              </div>
+              <div className={styles.subContent}>
+                {c.promotionRate/10}%
               </div>
             </div>
           </div>
           <div className={styles.right}>
-            <Button type="primary" text>编辑</Button>
-            <Button type="primary" text>订阅</Button>
-            <Button type="primary" text>删除</Button>
+            <Button type="primary" text>查看详情</Button>
           </div>
         </div>
       </div>
     ));
   };
+
 
   return (
     <>
@@ -109,24 +156,18 @@ const BasicList: React.FunctionComponent<BasicListProps> = (props: BasicListProp
         <Box className={styles.TagBox}>
           <div className={styles.TagBoxItem}>
             <Typography.Text className={styles.TagTitleName}>标签分类</Typography.Text>
-            <TagGroup>{renderTagListA()}</TagGroup>
+            <TagGroup>{renderTabList()}</TagGroup>
           </div>
         </Box>
 
         <Loading visible={loading} className={styles.MainList}>
-          <Box className={styles.MainContent} spacing={10}>
-            <div className={styles.ListItem}>
-              <div className={styles.add}>
-                <Icon type="add" className={styles.icon} size="xs" />
-                <div className={styles.addText}>添加内容</div>
-              </div>
-            </div>
+          <Box className={styles.MainContent} spacing={0.5}>
             {renderCards()}
             <Box margin={[15, 0, 0, 0]} direction="row" align="center" justify="space-between">
               <div className={styles.total}>
-                共<span>200</span>条需求
+                共<span>{total}</span>条
               </div>
-              <Pagination onChange={onPaginationChange} />
+              <Pagination current={pageNo} total={total} onChange={onPaginationChange} />
             </Box>
           </Box>
         </Loading>

@@ -2,7 +2,7 @@ const headerMenuConfig = [];
 
 const asideMenuConfig = [
   {
-    name: '羊毛惠',
+    name: '羊毛慧',
     path: '/',
     icon: 'chart-pie',
     children: [

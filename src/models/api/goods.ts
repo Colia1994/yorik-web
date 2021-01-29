@@ -3,7 +3,7 @@
  */
 import {
   sourceSDK,
-} from '@/models/source-sdk'
+} from '@/models/source-sdk';
 
 import {
   GoodsCatsDTO,
@@ -12,14 +12,14 @@ import {
   GoodsRecommendRequest,
   GoodsListDTO,
   GoodsSearchRequest,
-} from '../schema/goods'
+} from '../schema/goods';
 
 // 商品类目信息
 export const getAllCats = () => {
   return sourceSDK.wrappedRequest<GoodsCatsDTO>({
     url: 'api/goods/getAllCats',
   })
-}
+};
 
 // 获取商品详情
 export const getGoodsDetail = (body: GoodsDetailRequest) => {
@@ -27,7 +27,7 @@ export const getGoodsDetail = (body: GoodsDetailRequest) => {
     url: 'api/goods/getGoodsDetail',
     body: body,
   })
-}
+};
 
 // 获取推荐商品信息
 export const getGoodsList = (body: GoodsRecommendRequest) => {
@@ -35,7 +35,7 @@ export const getGoodsList = (body: GoodsRecommendRequest) => {
     url: 'api/goods/getRecommendGoods',
     body: body,
   })
-}
+};
 
 // 搜索商品
 export const searchGoods = (body: Partial<GoodsSearchRequest>) => {
@@ -43,4 +43,4 @@ export const searchGoods = (body: Partial<GoodsSearchRequest>) => {
     url: 'api/goods/searchGoods',
     body: body,
   })
-}
+};

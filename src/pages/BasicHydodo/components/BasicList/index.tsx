@@ -37,7 +37,7 @@ const DEFAULT_DATA: DataSource = {
 
 const BasicList: React.FunctionComponent = (): JSX.Element => {
 
-
+  //页面加载标记
   const [loading, setLoading] = useState<boolean>(true);
   //标签
   const [tabs, setTabs] = useState<GoodsCatDTO[]>([]);
@@ -49,6 +49,7 @@ const BasicList: React.FunctionComponent = (): JSX.Element => {
   const [pageNo, setPageNo] = useState<number>(DEFAULT_DATA.pageNo);
   //总数
   const [total, setTotal] = useState<number>(DEFAULT_DATA.total);
+  const [value, setValue] = useState<string>(DEFAULT_DATA.value);
 
 
   useEffect(() => {
@@ -57,9 +58,9 @@ const BasicList: React.FunctionComponent = (): JSX.Element => {
 
   useEffect(() => {
     requestGoodsList();
-  }, [currentCatId]);
+  }, [currentCatId,value]);
 
-  const onSearch = () => requestCatsList()
+
 
   const onTagValueChange = (v: number) => {
     setLoading(true);
@@ -67,7 +68,9 @@ const BasicList: React.FunctionComponent = (): JSX.Element => {
   };
 
 
-  const onSearchClick = () => requestGoodsList();
+  const onSearchClick = (value: string) => {
+    setValue(value);
+  }
 
   const onPaginationChange = (current: number) => {
     setPageNo(current);
@@ -89,11 +92,13 @@ const BasicList: React.FunctionComponent = (): JSX.Element => {
     searchGoods({
       pageNo: pageNo,
       pageSize: 10,
-      keyword:  undefined,
+      keyword:  value || undefined,
       catId: currentCatId === 0 ? undefined : currentCatId,
     }).then(res => {
-      setDatas(res.records);
-      setTotal(res.total);
+      if(res){
+        setDatas(res.records);
+        setTotal(res.total);
+      }
       }).finally(() => setLoading(false))
   }
 

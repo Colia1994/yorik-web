@@ -1,4 +1,4 @@
-import { EIRequest, EIStatusCode } from './base'
+import { EIRequest, EIStatusCode } from './base';
 import {
   HttpRequestMethod,
   HttpRequestOptions,
@@ -8,9 +8,9 @@ import {
   RemoteErrorSymbol,
   FILE_SERVER_SUFFIX,
   FILE_SERVER_NAME,
-} from './module'
-import { isValidSymbol } from './util'
-import { HttpPagination } from './pagination'
+} from './module';
+import { isValidSymbol } from './util';
+import { HttpPagination } from './pagination';
 
 export class SourceSDK {
   public request: EIRequest

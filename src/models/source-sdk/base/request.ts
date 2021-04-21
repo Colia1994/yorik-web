@@ -152,7 +152,8 @@ export class EIRequest {
       url: fetchUrl,
       data: options.body,
       header: { ...options.headers },
-      credentials: undefined,
+      withCredentials: true,
+      credentials: config.withoutCredentials ? undefined : 'include',
     }
     return await request(opt)
   }

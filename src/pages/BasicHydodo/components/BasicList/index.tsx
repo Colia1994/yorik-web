@@ -56,6 +56,7 @@ const BasicList: React.FunctionComponent = (): JSX.Element => {
     requestCatsList();
   }, []);
 
+  //监听变化来触发
   useEffect(() => {
     requestGoodsList();
   }, [currentCatId,value]);

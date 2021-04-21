@@ -1,4 +1,5 @@
 import { EIRequest, EIStatusCode } from './base';
+import { Message } from '@alifd/next';
 import {
   HttpRequestMethod,
   HttpRequestOptions,
@@ -53,12 +54,14 @@ export class SourceSDK {
               return
             }
             // 200 success，业务层应该或有可能需要对该场景进行处理，比如 submit 后端校验失败
+            // resolve(res.data!)
+            // resolve(res)
+            Message.error(res.msg);
             reject(res)
           }
         })
         .catch((e: Error) =>{
           // json failed
-          console.info('4444444');
           reject(e);
         })
     })
@@ -74,11 +77,20 @@ export class SourceSDK {
     return new Promise((resolve, reject) => {
       (this.request as any)
         [method]({ url, body, config, options })
-        .then((res: T) => {
-          if (res) {
-            resolve(res!)
+        .then((res: HttpResponse<T>) => {
+        
+          if (res && res.success) {
+            resolve(res.data!)
           } else {
-            reject()
+            // sso 278
+            if (res && res.ssoRefuse) {
+              return
+            }
+            // 200 success，业务层应该或有可能需要对该场景进行处理，比如 submit 后端校验失败
+            // resolve(res.data!)
+            // resolve(res)
+            Message.error(res.msg);
+            reject(res)
           }
         })
         .catch((e: Error) => reject(e))

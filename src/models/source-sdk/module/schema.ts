@@ -98,6 +98,7 @@ export type HttpSearchRequestQuery = {
 export type HttpResponse<T> = {
   success: boolean
   data: T | null
+  msg: string
   arguments: any | null
   errorCode: number
   errorMsg: string

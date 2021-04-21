@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Input, Message, Form, Divider, Checkbox, Icon } from '@alifd/next';
-
+import { loginIn } from '@/models/api/login';
 import { useInterval } from './utils';
 import styles from './index.module.scss';
 
 const { Item } = Form;
 
 export interface IDataSource {
-  name: string;
+  userName: string;
   password: string;
   autoLogin: boolean;
   phone: string;
@@ -15,8 +15,7 @@ export interface IDataSource {
 }
 
 const DEFAULT_DATA: IDataSource = {
-  name: '',
-  // eslint-disable-next-line @iceworks/best-practices/no-secret-info
+  userName: '',
   password: '',
   autoLogin: true,
   phone: '',
@@ -38,6 +37,10 @@ const LoginBlock: React.FunctionComponent<LoginProps> = (
   const [isPhone, checkPhone] = useState(false);
   const [second, setSecond] = useState(59);
 
+  const [userName, setUserName] = useState(DEFAULT_DATA.userName);
+
+  const [password, setPassword] = useState(DEFAULT_DATA.password);
+
   useInterval(
     () => {
       setSecond(second - 1);
@@ -46,7 +49,7 @@ const LoginBlock: React.FunctionComponent<LoginProps> = (
         setSecond(59);
       }
     },
-    isRunning ? 1000 : null,
+    isRunning ? 1000 : 0,
   );
 
   const formChange = (values: IDataSource) => {
@@ -66,8 +69,17 @@ const LoginBlock: React.FunctionComponent<LoginProps> = (
       console.log('errors', errors);
       return;
     }
-    console.log('values:', values);
-    Message.success('登录成功');
+  
+
+    loginIn({
+      userName: userName,
+      password: password,
+      confirmPwd: password,
+    }).then(res => {
+        Message.success('登录成功');
+        window.location.href = "/";
+      });
+
   };
 
   const phoneForm = (
@@ -114,10 +126,10 @@ const LoginBlock: React.FunctionComponent<LoginProps> = (
   const accountForm = (
     <>
       <Item required requiredMessage="必填">
-        <Input name="name" maxLength={20} placeholder="用户名" />
+        <Input name="userName" maxLength={20} placeholder="用户名" onChange={setUserName} />
       </Item>
       <Item required requiredMessage="必填" style={{ marginBottom: 0 }}>
-        <Input.Password name="password" htmlType="password" placeholder="密码" />
+        <Input.Password name="password" htmlType="password" placeholder="密码" onChange={setPassword}  />
       </Item>
     </>
   );

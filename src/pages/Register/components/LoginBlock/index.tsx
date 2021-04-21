@@ -5,11 +5,13 @@ import { Input, Message, Form } from '@alifd/next';
 
 import { useInterval } from './utils';
 import styles from './index.module.scss';
+import { register } from '@/models/api/login';
 
 const { Item } = Form;
 
 export interface RegisterProps {
   email: string;
+  userName: string;
   password: string;
   rePassword: string;
   phone: string;
@@ -19,6 +21,7 @@ export interface RegisterProps {
 export default function RegisterBlock() {
   const [postData, setValue] = useState({
     email: '',
+    userName: '',
     password: '',
     rePassword: '',
     phone: '',
@@ -27,6 +30,9 @@ export default function RegisterBlock() {
 
   const [isRunning, checkRunning] = useState(false);
   const [second, setSecond] = useState(59);
+  const [userName, setUserName] = useState<string>(postData.userName);
+  const [password, setPassword] = useState<string>(postData.password);
+  const [rePassword, setRePassword] = useState<string>(postData.rePassword);
 
   useInterval(() => {
     setSecond(second - 1);
@@ -61,8 +67,18 @@ export default function RegisterBlock() {
       console.log('errors', errors);
       return;
     }
-    console.log('values:', values);
-    Message.success('注册成功');
+ 
+    register({
+      userName: userName,
+      password: password,
+      confirmPwd: rePassword,
+    }).then(res => {
+      Message.success('注册成功');
+      window.location.href = "/#/user/login";
+    }).catch(()=>{})
+    
+ 
+
   };
 
   return (
@@ -78,8 +94,8 @@ export default function RegisterBlock() {
         <p className={styles.desc}>注册账号</p>
 
         <Form value={postData} onChange={formChange} size="large">
-          <Item format="email" required requiredMessage="必填">
-            <Input name="email" size="large" maxLength={20} placeholder="邮箱" />
+          <Item required requiredMessage="必填">
+            <Input name="userName" size="large" maxLength={20} placeholder="账号" onChange={setUserName} />
           </Item>
           <Item required requiredMessage="必填">
             <Input.Password
@@ -87,6 +103,7 @@ export default function RegisterBlock() {
               size="large"
               htmlType="password"
               placeholder="至少六位密码，区分大小写"
+              onChange={setPassword}
             />
           </Item>
           <Item required requiredTrigger="onFocus" requiredMessage="必填" validator={checkPass}>
@@ -95,9 +112,10 @@ export default function RegisterBlock() {
               size="large"
               htmlType="password"
               placeholder="确认密码"
+              onChange={setRePassword}
             />
           </Item>
-          <Item format="tel" required requiredMessage="必填" asterisk={false}>
+          {/* <Item format="tel" required requiredMessage="必填" asterisk={false}>
             <Input
               name="phone"
               size="large"
@@ -110,8 +128,8 @@ export default function RegisterBlock() {
               maxLength={20}
               placeholder="手机号"
             />
-          </Item>
-          <Item required requiredMessage="必填">
+          </Item> */}
+          {/* <Item required requiredMessage="必填">
             <Input
               name="code"
               size="large"
@@ -134,7 +152,7 @@ export default function RegisterBlock() {
               maxLength={20}
               placeholder="验证码"
             />
-          </Item>
+          </Item> */}
           <Item>
             <Form.Submit
               type="primary"

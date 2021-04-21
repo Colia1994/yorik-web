@@ -5,13 +5,13 @@ export const DEFAULT_REQUEST_CONFIG: EIRequestConfig = {
     PROTOCOL: 'https',
     FE_DOMAIN: 'hydodo.com',
     BE_DOMAIN: 'www.hydodo.com',
-    INNER_URL: 'http://192.168.8.104/ei-ob/moon',
+    // INNER_URL: 'http://192.168.8.104/ei-ob/moon',
   },
   [EnvType.Dev]: {
     PROTOCOL: 'https',
-    FE_DOMAIN: 'hydodo-dev.com',
-    BE_DOMAIN: 'www.hydodo.com',
-    // BE_DOMAIN: '192.168.31.24:8080'
+    FE_DOMAIN: 'hydodo.com',
+    // BE_DOMAIN: 'www.hydodo.com',
+    BE_DOMAIN: 'www.hydodo.com'
   },
 }
 

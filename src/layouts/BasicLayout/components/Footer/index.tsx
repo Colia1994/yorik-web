@@ -6,7 +6,7 @@ export default function Footer() {
     <p className={styles.footer}>
       {/* <span className={styles.logo}>Alibaba Fusion</span> */}
       <br />
-      <a className={styles.copyright} href="https://beian.miit.gov.cn/">沪ICP备20024959号</a>
+      <a className={styles.copyright} href="https://beian.miit.gov.cn/">沪ICP备20024959号-1</a>
     </p>
   );
 }

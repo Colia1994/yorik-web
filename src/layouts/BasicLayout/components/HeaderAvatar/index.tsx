@@ -1,8 +1,8 @@
-import React, {useEffect, useState}from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { Avatar, Message,Overlay, Menu, Icon } from '@alifd/next';
+import { Avatar, Message, Overlay, Menu, Icon } from '@alifd/next';
 import styles from './index.module.scss';
-import { logout, currentUser } from '@/models/api/login';
+import { logout } from '@/models/api/login';
 
 const { Item } = Menu;
 const { Popup } = Overlay;
@@ -12,8 +12,6 @@ export interface Props {
   avatar: string;
   mail: string;
 }
-
-
 
 
 // const UserProfile = ({ name, avatar, mail }) => {
@@ -31,7 +29,6 @@ export interface Props {
 // };
 
 
-
 const HeaderAvatar = (props: Props) => {
 
   const [name ,setName] = useState<String>(props.name);
@@ -43,21 +40,21 @@ const HeaderAvatar = (props: Props) => {
   }, []);
 
 
-   /**
+  /**
    * 获取登陆用户
    */
   const getCurretnUser = () => {
-    currentUser().then(res => {
-      setName(res.userName);
-    }).catch(()=>{})
-    };
+    // currentUser().then(res => {
+    //   setName(res.userName);
+    // }).catch(()=>{})
+  };
 
-  const userLogout =() =>{
-  logout().then(res => {
+  const userLogout = () => {
+    logout().then(() => {
       Message.success('登出成功');
-      window.location.href = "/#/user/login";
+      window.location.href = '/#/user/login';
     });
-  }
+  };
 
   return (
     <Popup

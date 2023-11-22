@@ -1,5 +1,5 @@
-import React, { useState, useEffect} from 'react';
-import { Box, Search, Card, Tag, Divider, Typography, Icon, Loading, Button, Pagination } from '@alifd/next';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Box, Search, Card, Tag, Divider, Typography, Loading, Button, Pagination } from '@alifd/next';
 import { searchGoods, getAllCats } from '@/models/api/goods';
 import { GoodsDetailDTO, GoodsCatDTO } from '@/models/schema/goods';
 
@@ -15,17 +15,17 @@ export interface ICardItem {
 }
 
 export interface DataSource {
-  datas: GoodsDetailDTO[]
-  pageNo: number
-  total: number
-  value: string
-  tabs: GoodsCatDTO[]
-  currentCatId: number
-  currentTabIndex: number
+  data: GoodsDetailDTO[];
+  pageNo: number;
+  total: number;
+  value: string;
+  tabs: GoodsCatDTO[];
+  currentCatId: number;
+  currentTabIndex: number;
 }
 
 const DEFAULT_DATA: DataSource = {
-  datas: [],
+  data: [],
   pageNo: 1,
   total: 0,
   value: '',
@@ -37,31 +37,60 @@ const DEFAULT_DATA: DataSource = {
 
 const BasicList: React.FunctionComponent = (): JSX.Element => {
 
-  //页面加载标记
+  // 页面加载标记
   const [loading, setLoading] = useState<boolean>(true);
-  //标签
+  // 标签
   const [tabs, setTabs] = useState<GoodsCatDTO[]>([]);
-  //当前选中标签
+  // 当前选中标签
   const [currentCatId, setCatId] = useState<number>(DEFAULT_DATA.currentCatId);
-  //商品数据
-  const [datas, setDatas] = useState<GoodsDetailDTO[]>(DEFAULT_DATA.datas);
-  //页码
+  // 商品数据
+  const [data, setData] = useState<GoodsDetailDTO[]>(DEFAULT_DATA.data);
+  // 页码
   const [pageNo, setPageNo] = useState<number>(DEFAULT_DATA.pageNo);
-  //总数
+  // 总数
   const [total, setTotal] = useState<number>(DEFAULT_DATA.total);
   const [value, setValue] = useState<string>(DEFAULT_DATA.value);
-
 
   useEffect(() => {
     requestCatsList();
   }, []);
 
-  //监听变化来触发
+  // // 监听变化来触发
+  // useEffect(() => {
+  //   const requestGoodsList = () => {
+  //     setLoading(true);
+  //     searchGoods({
+  //       pageNo,
+  //       pageSize: 10,
+  //       keyword: value || undefined,
+  //       catId: currentCatId === 0 ? undefined : currentCatId,
+  //     }).then((res) => {
+  //       if (res) {
+  //         setData(res.records);
+  //         setTotal(res.total);
+  //       }
+  //     }).finally(() => setLoading(false));
+  //   };
+  //   requestGoodsList();
+  // }, [currentCatId, value, pageNo]);
+
+  const requestGoodsList = useCallback(() => {
+    setLoading(true);
+    searchGoods({
+      pageNo,
+      pageSize: 10,
+      keyword: value || undefined,
+      catId: currentCatId === 0 ? undefined : currentCatId,
+    }).then((res) => {
+      if (res) {
+        setData(res.records);
+        setTotal(res.total);
+      }
+    }).finally(() => setLoading(false));
+  }, [currentCatId, value, pageNo]);
   useEffect(() => {
     requestGoodsList();
-  }, [currentCatId,value]);
-
-
+  }, [requestGoodsList]);
 
   const onTagValueChange = (v: number) => {
     setLoading(true);
@@ -69,43 +98,42 @@ const BasicList: React.FunctionComponent = (): JSX.Element => {
   };
 
 
-  const onSearchClick = (value: string) => {
-    setValue(value);
-  }
+  const onSearchClick = (v: string) => {
+    setValue(v);
+  };
 
   const onPaginationChange = (current: number) => {
     setPageNo(current);
     requestGoodsList();
-  }
-
- /**
+  };
+  /**
    * 获取全量标签
    */
   const requestCatsList = () => {
-    getAllCats().then(res => {
-      setTabs(res.goodsCatsList); 
+    getAllCats().then((res) => {
+      setTabs(res.goodsCatsList);
       setCatId(res.goodsCatsList[0].catId);
-    }).catch(()=>{})
+    }).catch(() => {});
   };
 
-  const requestGoodsList = () => {
-    setLoading(true);
-    searchGoods({
-      pageNo: pageNo,
-      pageSize: 10,
-      keyword:  value || undefined,
-      catId: currentCatId === 0 ? undefined : currentCatId,
-    }).then(res => {
-      if(res){
-        setDatas(res.records);
-        setTotal(res.total);
-      }
-      }).finally(() => setLoading(false))
-  }
+  // const requestGoodsList = () => {
+  //   setLoading(true);
+  //   searchGoods({
+  //     pageNo,
+  //     pageSize: 10,
+  //     keyword: value || undefined,
+  //     catId: currentCatId === 0 ? undefined : currentCatId,
+  //   }).then((res) => {
+  //     if (res) {
+  //       setData(res.records);
+  //       setTotal(res.total);
+  //     }
+  //   }).finally(() => setLoading(false));
+  // };
 
   const renderTabList = () => {
-    //获取全量 tag 
-    return tabs.map((tab: GoodsCatDTO, i: number) => (
+    // 获取全量 tag
+    return tabs.map((tab: GoodsCatDTO) => (
       <SelectableTag
         key={tab.catId}
         checked={currentCatId === tab.catId}
@@ -117,8 +145,8 @@ const BasicList: React.FunctionComponent = (): JSX.Element => {
 
 
   const renderCards = () => {
-    return datas.map((c: GoodsDetailDTO, i: number) => (
-      <div className={styles.ListItem} key={i}>
+    return data.map((c: GoodsDetailDTO) => (
+      <div className={styles.ListItem}>
         <div className={styles.main}>
           <div className={styles.left}>
             <img src={c.goodsThumbnailUrl} alt="img" />
@@ -133,13 +161,10 @@ const BasicList: React.FunctionComponent = (): JSX.Element => {
                 {c.categoryName}
               </div>
               <div className={styles.subContent}>
-                {c.minGroupPrice/100}
+                价格 {c.minGroupPrice / 100}
               </div>
               <div className={styles.subContent}>
-                {c.minGroupPrice/100}
-              </div>
-              <div className={styles.subContent}>
-                {c.promotionRate/10}%
+                佣金率 {c.promotionRate / 10}%
               </div>
             </div>
           </div>

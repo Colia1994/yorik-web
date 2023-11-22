@@ -4,9 +4,9 @@ import styles from './index.module.scss';
 export default function Footer() {
   return (
     <p className={styles.footer}>
-      {/* <span className={styles.logo}>Alibaba Fusion</span> */}
-      <br />
-      <a className={styles.copyright} href="https://beian.miit.gov.cn/">沪ICP备20024959号-1</a>
+      <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer">
+        <span className={styles.copyright}>沪ICP备20024959号-1</span>
+      </a>
     </p>
   );
 }

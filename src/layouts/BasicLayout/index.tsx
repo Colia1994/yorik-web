@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { Shell, ConfigProvider } from '@alifd/next';
 import PageNav from './components/PageNav';
-import GlobalSearch from './components/GlobalSearch';
-import Notice from './components/Notice';
-import SolutionLink from './components/SolutionLink';
 import HeaderAvatar from './components/HeaderAvatar';
 import Logo from './components/Logo';
 import Footer from './components/Footer';
@@ -80,24 +77,20 @@ export default function BasicLayout({
             text="Logo"
           />
         </Shell.Branding>
-        <Shell.Navigation
-          direction="hoz"
-          style={{
-            marginRight: 10,
-          }}
-        >
-          <GlobalSearch />
-        </Shell.Navigation>
         <Shell.Action>
-          <Notice />
-          <SolutionLink />
           <HeaderAvatar />
         </Shell.Action>
         <Shell.Navigation>
           <PageNav />
         </Shell.Navigation>
 
-        <Shell.Content>{children}</Shell.Content>
+        <Shell.Content
+          style={{
+            padding: 10,
+          }}
+        >
+          {children}
+        </Shell.Content>
         <Shell.Footer>
           <Footer />
         </Shell.Footer>
